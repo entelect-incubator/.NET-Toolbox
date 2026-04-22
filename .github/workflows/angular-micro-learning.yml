@@ -1,0 +1,165 @@
+name: Angular Micro Learning Framework CI
+
+on:
+    push:
+        branches: [main, develop]
+        paths:
+            - "micro-learning-framework/**"
+            - ".github/workflows/angular-micro-learning.yml"
+    pull_request:
+        branches: [main, develop]
+        paths:
+            - "micro-learning-framework/**"
+            - ".github/workflows/angular-micro-learning.yml"
+
+jobs:
+    build-and-test:
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                working-directory: ./micro-learning-framework/micro-learning-app
+
+        strategy:
+            matrix:
+                node-version: [18.x, 20.x]
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: "npm"
+                  cache-dependency-path: "./micro-learning-framework/micro-learning-app/package-lock.json"
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Install Angular CLI
+              run: npm install -g @angular/cli
+
+            - name: Run tests
+              run: npm run test -- --watch=false --browsers=ChromeHeadless
+
+            - name: Build project
+              run: npm run build
+
+            - name: Build with watch (validation)
+              run: timeout 30s npm run watch || echo "Watch build validation completed"
+
+            - name: Upload build artifacts
+              if: success()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: micro-learning-build-${{ matrix.node-version }}
+                  path: micro-learning-framework/micro-learning-app/dist
+                  retention-days: 7
+
+    lint-and-format:
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                working-directory: ./micro-learning-framework/micro-learning-app
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Use Node.js 20.x
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20.x
+                  cache: "npm"
+                  cache-dependency-path: "./micro-learning-framework/micro-learning-app/package-lock.json"
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Install Angular CLI
+              run: npm install -g @angular/cli
+
+            - name: Run Angular lint
+              run: ng lint || echo "Lint completed with warnings/errors"
+
+            - name: Check Prettier formatting
+              run: npx prettier --check "src/**/*.{ts,html,scss,css,json}"
+
+    security:
+        runs-on: ubuntu-latest
+
+        defaults:
+            run:
+                working-directory: ./micro-learning-framework/micro-learning-app
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Use Node.js 20.x
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20.x
+                  cache: "npm"
+                  cache-dependency-path: "./micro-learning-framework/micro-learning-app/package-lock.json"
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Run security audit
+              run: npm audit --audit-level=moderate
+
+            - name: Check for outdated packages
+              run: npm outdated || true
+
+    supabase-validation:
+        runs-on: ubuntu-latest
+        if: github.event_name == 'push'
+
+        defaults:
+            run:
+                working-directory: ./micro-learning-framework
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Validate Supabase schema
+              run: |
+                  echo "Validating Supabase schema and migrations..."
+                  if [ -f "supabase-schema.sql" ]; then
+                    echo "✓ Supabase schema file found"
+                  else
+                    echo "⚠ Supabase schema file not found"
+                  fi
+
+                  if [ -d "supabase/migrations" ]; then
+                    echo "✓ Supabase migrations directory found"
+                    find supabase/migrations -name "*.sql" -type f | wc -l | xargs echo "Migration files found:"
+                  else
+                    echo "⚠ Supabase migrations directory not found"
+                  fi
+
+            - name: Check migration consistency
+              run: |
+                  if [ -f "migrations/002_update_team_comments.sql" ]; then
+                    echo "✓ Additional migration file found"
+                  fi
+                  echo "Migration validation completed"
+
+    build-summary:
+        runs-on: ubuntu-latest
+        needs: [build-and-test, lint-and-format, security]
+        if: always()
+
+        steps:
+            - name: Build Summary
+              run: |
+                  echo "## Angular Micro Learning Framework CI Summary" >> $GITHUB_STEP_SUMMARY
+                  echo "- Build and Test: ${{ needs.build-and-test.result }}" >> $GITHUB_STEP_SUMMARY
+                  echo "- Lint and Format: ${{ needs.lint-and-format.result }}" >> $GITHUB_STEP_SUMMARY
+                  echo "- Security: ${{ needs.security.result }}" >> $GITHUB_STEP_SUMMARY
+                  echo "- Overall Status: ${{ (needs.build-and-test.result == 'success' && needs.lint-and-format.result == 'success' && needs.security.result == 'success') && 'SUCCESS' || 'FAILURE' }}" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PaymentSaga.Api/PaymentSaga.Api.csproj" />
+    <Project Path="src/PaymentSaga.AppHost/PaymentSaga.AppHost.csproj" />
+    <Project Path="src/PaymentSaga.Application/PaymentSaga.Application.csproj" />
+    <Project Path="src/PaymentSaga.Domain/PaymentSaga.Domain.csproj" />
+    <Project Path="src/PaymentSaga.Infrastructure/PaymentSaga.Infrastructure.csproj" />
+    <Project Path="src/PaymentSaga.Tests/PaymentSaga.Tests.csproj" />
+  </Folder>
+</Solution>

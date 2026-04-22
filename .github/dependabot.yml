@@ -1,0 +1,106 @@
+version: 2
+
+updates:
+  # ── NuGet packages — 4.Utilities ────────────────────────────────────────────
+  - package-ecosystem: nuget
+    directory: "/4.Utilities"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: "Africa/Johannesburg"
+    open-pull-requests-limit: 5
+    groups:
+      opentelemetry:
+        patterns: [ "OpenTelemetry*" ]
+      serilog:
+        patterns: [ "Serilog*" ]
+    labels:
+      - dependencies
+      - dotnet
+
+  # ── NuGet packages — PaymentSaga ────────────────────────────────────────────
+  - package-ecosystem: nuget
+    directory: "/5.PaymentSaga/src/PaymentSaga.Domain"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: "Africa/Johannesburg"
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - dotnet
+
+  - package-ecosystem: nuget
+    directory: "/5.PaymentSaga/src/PaymentSaga.Application"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: "Africa/Johannesburg"
+    open-pull-requests-limit: 5
+    groups:
+      masstransit:
+        patterns: [ "MassTransit*" ]
+    labels:
+      - dependencies
+      - dotnet
+
+  - package-ecosystem: nuget
+    directory: "/5.PaymentSaga/src/PaymentSaga.Infrastructure"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: "Africa/Johannesburg"
+    open-pull-requests-limit: 5
+    groups:
+      masstransit:
+        patterns: [ "MassTransit*" ]
+      efcore:
+        patterns: [ "Microsoft.EntityFrameworkCore*" ]
+    labels:
+      - dependencies
+      - dotnet
+
+  - package-ecosystem: nuget
+    directory: "/5.PaymentSaga/src/PaymentSaga.Api"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: "Africa/Johannesburg"
+    open-pull-requests-limit: 5
+    groups:
+      opentelemetry:
+        patterns: [ "OpenTelemetry*" ]
+    labels:
+      - dependencies
+      - dotnet
+
+  - package-ecosystem: nuget
+    directory: "/5.PaymentSaga/src/PaymentSaga.Tests"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: "Africa/Johannesburg"
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - dotnet
+      - testing
+
+  # ── GitHub Actions ───────────────────────────────────────────────────────────
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: "Africa/Johannesburg"
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - github-actions

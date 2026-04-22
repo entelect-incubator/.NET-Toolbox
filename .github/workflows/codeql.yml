@@ -1,0 +1,45 @@
+name: CodeQL Security Scan
+
+on:
+    push:
+        branches: [ "main", "develop" ]
+    pull_request:
+        branches: [ "main", "develop" ]
+    schedule:
+        # Run every Monday at 08:00 UTC
+        - cron: "0 8 * * 1"
+    workflow_dispatch:
+
+jobs:
+    analyze:
+        name: Analyze C#
+        runs-on: ubuntu-latest
+        permissions:
+            actions: read
+            contents: read
+            security-events: write
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v4
+              with:
+                  dotnet-version: "10.0.x"
+
+            - name: Initialize CodeQL
+              uses: github/codeql-action/init@v3
+              with:
+                  languages: csharp
+                  queries: security-and-quality
+
+            - name: Build for CodeQL (Utilities)
+              run: dotnet build 4.Utilities/Utilities.csproj --configuration Release
+
+            - name: Build for CodeQL (PaymentSaga)
+              run: dotnet build 5.PaymentSaga/PaymentSaga.slnx --configuration Release
+
+            - name: Perform CodeQL Analysis
+              uses: github/codeql-action/analyze@v3
+              with:
+                  category: "/language:csharp"

@@ -1,0 +1,76 @@
+name: Build & Test
+
+on:
+    push:
+        branches: [ "main", "develop" ]
+    pull_request:
+        branches: [ "main", "develop" ]
+    workflow_dispatch:
+
+env:
+    DOTNET_VERSION: "10.0.x"
+    DOTNET_NOLOGO: true
+    DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+    build-utilities:
+        name: Utilities — Build & Test
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v4
+              with:
+                  dotnet-version: ${{ env.DOTNET_VERSION }}
+
+            - name: Restore
+              run: dotnet restore 4.Utilities/Utilities.csproj
+
+            - name: Build
+              run: dotnet build 4.Utilities/Utilities.csproj --no-restore --configuration
+                  Release
+
+    build-payment-saga:
+        name: PaymentSaga — Build & Test
+        runs-on: ubuntu-latest
+        needs: build-utilities
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v4
+              with:
+                  dotnet-version: ${{ env.DOTNET_VERSION }}
+
+            - name: Restore
+              run: dotnet restore 5.PaymentSaga/PaymentSaga.slnx
+
+            - name: Build
+              run: dotnet build 5.PaymentSaga/PaymentSaga.slnx --no-restore --configuration
+                  Release
+
+            - name: Test
+              run: |
+                  dotnet test 5.PaymentSaga/PaymentSaga.slnx \
+                    --no-build \
+                    --configuration Release \
+                    --logger "trx;LogFileName=test-results.trx" \
+                    --collect:"XPlat Code Coverage" \
+                    -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
+
+            - name: Upload test results
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: test-results
+                  path: "**/TestResults/*.trx"
+
+            - name: Upload coverage
+              uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: coverage
+                  path: "**/TestResults/**/coverage.cobertura.xml"
