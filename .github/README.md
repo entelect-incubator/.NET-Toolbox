@@ -1,138 +1,131 @@
 # GitHub Actions CI/CD Workflows
 
-This repository contains automated CI/CD workflows for various project types in the Incubator.
+This repository contains automated CI/CD workflows for .NET projects.
 
 ## 🚀 Active Workflows
 
-### 1. React Landing Page CI (`react-landing-page.yml`)
-**Triggers:** Changes to `LandingPage/**`
-- **Technology:** React + Vite + Biome
-- **Node Versions:** 18.x, 20.x
+### 1. Build & Test CI (`build.yml`)
+**Triggers:** Push to main/develop, PRs
+- **Technology:** .NET 10 / C#
+- **Projects:** Utilities, PaymentSaga modules
 - **Features:**
-  - Dependency installation and caching
-  - Biome linting and formatting
-  - Production and development builds
-  - Security audits
-  - Preview deployment preparation
-  - Build artifact uploads
+  - Multi-project build (sequential dependencies)
+  - NUnit test execution with coverage
+  - Test results & coverage artifacts
+  - Failure summaries on PR
 
-### 2. Angular Micro Learning Framework CI (`angular-micro-learning.yml`)
-**Triggers:** Changes to `micro-learning-framework/**`
-- **Technology:** Angular 20+ with SSR
-- **Node Versions:** 18.x, 20.x
+### 2. CodeQL Security Scan (`codeql.yml`)
+**Triggers:** Push, PR, weekly Monday 08:00 UTC
+- **Technology:** .NET 10 / C#
+- **Scope:** Utilities + PaymentSaga
 - **Features:**
-  - Angular CLI tests with ChromeHeadless
-  - Production builds
-  - Angular linting
-  - Prettier formatting checks
-  - Security audits
-  - Supabase schema validation
-  - Migration consistency checks
-  - Comprehensive build summaries
-
-### 3. React Projects CI (`react-projects.yml`)
-**Triggers:** Changes to `React/**`
-- **Technology:** Generic React projects
-- **Node Versions:** 18.x, 20.x
-- **Features:**
-  - Dynamic project detection
-  - Multi-project support
-  - Flexible script execution (lint, test, build)
-  - Auto-discovery of package.json files
-  - Helpful messaging when no projects found
-
-### 4. Theme CI (`theme.yml`)
-**Triggers:** Changes to `Theme/**`
-- **Technology:** Tailwind CSS + HTML
-- **Node Versions:** 18.x, 20.x
-- **Features:**
-  - Tailwind CSS compilation
-  - CSS quality metrics
-  - HTML validation
-  - Server startup testing
-  - Documentation completeness checks
-  - File size analysis
-  - Theme artifact uploads
+  - Automated security analysis
+  - Dependency scanning
+  - Vulnerability detection
+  - Build before analysis
 
 ## 📁 Project Structure Coverage
 
 ```
-Incubator/
-├── LandingPage/          → react-landing-page.yml
-├── React/                → react-projects.yml
-├── Theme/                → theme.yml
-├── micro-learning-framework/ → angular-micro-learning.yml
-└── .NET-Template/        → (Existing .NET workflows)
+.NET-Toolbox/
+├── 4.Utilities/                  → build.yml, codeql.yml
+├── 5.PaymentSaga/                → build.yml, codeql.yml
+│   ├── src/PaymentSaga.Domain/
+│   ├── src/PaymentSaga.Application/
+│   ├── src/PaymentSaga.Infrastructure/
+│   ├── src/PaymentSaga.Api/
+│   ├── src/PaymentSaga.AppHost/
+│   └── src/PaymentSaga.Tests/
+└── .github/
+    └── workflows/
+        ├── build.yml
+        ├── codeql.yml
+        └── dependabot.yml
 ```
 
 ## 🔧 Workflow Features
 
+### Build & Test
+- **Multi-Project:** Utilities builds first, PaymentSaga depends on it
+- **Test Coverage:** NUnit with FluentAssertions, NSubstitute, Bogus
+- **Architecture Tests:** NetArchTest to enforce Clean Architecture boundaries
+- **Artifact Upload:** Test results (TRX) + coverage reports
+
 ### Security & Quality
-- **Security Audits:** All workflows include `npm audit`
-- **Dependency Checks:** Outdated package detection
-- **Code Quality:** Linting and formatting validation
-- **Build Verification:** Multi-environment testing
+- **CodeQL Analysis:** C# specific queries, OWASP Top 10 checks
+- **Automated Scanning:** Runs on every push and PR
+- **Weekly Schedules:** Monday 08:00 UTC for baseline detection
+- **Build Prerequisites:** Code builds before scanning
 
-### Performance
-- **Caching:** Intelligent npm cache management
-- **Parallel Jobs:** Matrix builds for multiple Node versions
-- **Conditional Execution:** Path-based triggering
-- **Artifact Management:** 7-day retention for build outputs
-
-### Monitoring & Reporting
-- **Build Summaries:** Detailed status reports
-- **Step Summaries:** GitHub Actions summary integration
-- **Quality Reports:** CSS metrics and documentation status
-- **Validation Results:** Schema and configuration checks
+### Automation
+- **Dependabot:** Weekly NuGet package updates, grouped by ecosystem
+- **Branch Protection:** PR gates require passing workflows
+- **Notifications:** GitHub PR status checks on failure
 
 ## 🎯 Usage Guidelines
 
 ### Branch Strategy
-- **Main Branch:** Production-ready code
-- **Develop Branch:** Integration testing
-- **Feature Branches:** Trigger on PR to main/develop
+- **Main Branch:** Production-ready code, protected
+- **Develop Branch:** Integration branch
+- **Feature Branches:** PRs trigger full build + CodeQL
 
-### Path-Based Triggering
-Workflows only run when relevant files change:
-- Changes to workflow files trigger their own workflow
-- Project-specific changes only affect related workflows
-- Efficient resource usage and faster feedback
+### .NET Build Matrix
+- **Framework:** net10.0 (current stable)
+- **Configuration:** Debug (fast) and Release (optimized)
+- **Test Framework:** NUnit 4.x
+- **Coverage:** TRX + Cobertura formats
 
-### Node Version Strategy
-- **18.x:** LTS support
-- **20.x:** Current stable
-- **Matrix Testing:** Ensures compatibility across versions
+### Workflow Sequencing
+1. **Utilities** builds and tests first
+2. **PaymentSaga** depends on Utilities project reference
+3. **CodeQL** runs after successful build
+4. Parallel artifact collection
 
-## 🔄 Integration with Existing Workflows
+## 🔄 Pattern Modules
 
-These workflows complement existing .NET workflows:
-- Independent execution paths
-- No conflicts with existing CI/CD
-- Shared artifact storage patterns
-- Consistent security and quality standards
+### Utilities (Module 4)
+Patterns: Result, CQRS, Static Façade, Provider
+- Cross-cutting library used by all modules
+- No business logic, only patterns
+- `dotnet build 4.Utilities/Utilities.csproj`
+
+### PaymentSaga (Module 5)
+Patterns: Saga, Event-Driven, Retry, Repository
+- Long-running payment approval workflow
+- MassTransit + RabbitMQ + EF Core
+- `dotnet run --project 5.PaymentSaga/src/PaymentSaga.AppHost` (requires Docker)
 
 ## 📋 Maintenance
 
-### Adding New Projects
-1. Create project in appropriate folder
-2. Workflows auto-detect new projects
-3. Update path triggers if needed
-4. Test with small commits
+### Adding New Pattern Modules
+1. Create new module folder (e.g., `6.EventSourcing/`)
+2. Add projects: Domain, Application, Infrastructure, API, Tests
+3. Add project references to solution (`.slnx`)
+4. Update `build.yml` if new dependency chains exist
+5. Create `DEV.md` with Mermaid architecture diagrams
 
-### Customizing Workflows
-1. Modify relevant `.yml` file
-2. Test changes on feature branch
-3. Monitor workflow runs
-4. Update this documentation
+### Updating Workflows
+1. Edit relevant `.yml` file in `.github/workflows/`
+2. Test on feature branch
+3. Merge to main via PR
+4. Monitor first workflow run
+5. Update this README if scope changes
+
+### Dependabot Configuration
+- Edit `.github/dependabot.yml`
+- Add new NuGet package directories
+- Schedule weekly Monday 06:00 Africa/Johannesburg
+- Group by ecosystem (MassTransit, EF, OpenTelemetry, etc.)
 
 ## 🚦 Status Monitoring
 
 Check workflow status at:
-- **Actions Tab:** GitHub repository actions
-- **Pull Requests:** Status checks on PRs
-- **Commit Status:** Individual commit results
-- **Artifacts:** Download build outputs
+- **Actions Tab:** All workflow runs with logs
+- **Pull Requests:** Required status checks on PRs
+- **Commit Status:** Individual commit workflow results
+- **Artifacts:** Download test results & coverage reports (7-day retention)
 
 ---
 
-*Last Updated: Created during k6 template distribution and CI/CD setup*
+*Workflows for .NET Toolbox — C# design patterns & architectural reference implementations*
+*Last Updated: April 2026*

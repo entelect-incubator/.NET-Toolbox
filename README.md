@@ -94,6 +94,8 @@ PaymentSaga.Tests/
 
 ---
 
+## Security
+
 - Static analysis via CodeQL on every push and PR.
 - NuGet dependencies are kept up to date automatically via Dependabot (weekly, Mondays).
 - See [SECURITY.md](SECURITY.md) if you discover a vulnerability.
