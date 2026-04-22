@@ -1,7 +1,7 @@
 # .NET Toolbox
 
-[![Build](https://github.com/YOUR_ORG/NET-Toolbox/actions/workflows/build.yml/badge.svg)](https://github.com/YOUR_ORG/NET-Toolbox/actions/workflows/build.yml)
-[![CodeQL](https://github.com/YOUR_ORG/NET-Toolbox/actions/workflows/codeql.yml/badge.svg)](https://github.com/YOUR_ORG/NET-Toolbox/actions/workflows/codeql.yml)
+[![Build](https://github.com/entelect-incubator/.NET-Toolbox/actions/workflows/build.yml/badge.svg)](https://github.com/entelect-incubator/.NET-Toolbox/actions/workflows/build.yml)
+[![CodeQL](https://github.com/entelect-incubator/.NET-Toolbox/actions/workflows/codeql.yml/badge.svg)](https://github.com/entelect-incubator/.NET-Toolbox/actions/workflows/codeql.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![.NET 10](https://img.shields.io/badge/.NET-10.0-purple)](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
 
