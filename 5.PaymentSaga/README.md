@@ -1,7 +1,7 @@
 # PaymentSaga — Developer Documentation
 
-[![Build](https://github.com/YOUR_ORG/NET-Toolbox/actions/workflows/build.yml/badge.svg)](https://github.com/YOUR_ORG/NET-Toolbox/actions/workflows/build.yml)
-[![CodeQL](https://github.com/YOUR_ORG/NET-Toolbox/actions/workflows/codeql.yml/badge.svg)](https://github.com/YOUR_ORG/NET-Toolbox/actions/workflows/codeql.yml)
+[![Build](https://github.com/entelect-incubator/.NET-Toolbox/actions/workflows/build.yml/badge.svg)](https://github.com/entelect-incubator/.NET-Toolbox/actions/workflows/build.yml)
+[![CodeQL](https://github.com/entelect-incubator/.NET-Toolbox/actions/workflows/codeql.yml/badge.svg)](https://github.com/entelect-incubator/.NET-Toolbox/actions/workflows/codeql.yml)
 [![.NET 10](https://img.shields.io/badge/.NET-10.0-purple)](https://dotnet.microsoft.com/download/dotnet/10.0)
 [![MassTransit](https://img.shields.io/badge/MassTransit-8.4-blue)](https://masstransit.io)
 [![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3.x-orange)](https://rabbitmq.com)
