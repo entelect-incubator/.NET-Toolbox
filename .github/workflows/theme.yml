@@ -74,7 +74,7 @@ jobs:
 
             - name: Upload theme artifacts
               if: success()
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: theme-build-${{ matrix.node-version }}
                   path: |
@@ -138,7 +138,7 @@ jobs:
                   cat css-report.md
 
             - name: Upload CSS report
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: css-quality-report
                   path: Theme/css-report.md
